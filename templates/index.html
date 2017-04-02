@@ -1,0 +1,14 @@
+{% block body %}
+  <h1>Donut Day Roulette</h1>
+  <ul>
+  {% for participant in participants %}
+    <li>{{ participant }}</li>
+  {% endfor %}
+  </ul>
+  <form action="{{ url_for('add') }}" method=post>
+    Take a donut and add your name:
+	<br>
+    <input type=text name=name>
+    <input type=submit value=Add>
+  </form>
+{% endblock %}
