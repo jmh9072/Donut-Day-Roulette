@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block body %}
+    {% if participants %}
+    Donut Roulette Entries:
+    <ol>
+        {% for participant in participants %}
+        <li>{{ participant }}</li>
+        {% endfor %}
+    </ol>
+    {% else %}
+        No one has taken any donuts yet!
+    {% endif %}
+{% endblock %}

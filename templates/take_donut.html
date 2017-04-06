@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block body %}
+    <form action="{{ url_for('add') }}" method=post>
+        There are <strong>{{ number_of_donuts_remaining }}</strong> donuts remaining!
+        <br />
+        Name:
+        <input type=text name=name />
+        <input type=submit value="Take Donut" />
+    </form>
+{% endblock %}
