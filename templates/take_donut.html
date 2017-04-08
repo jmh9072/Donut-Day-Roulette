@@ -1,10 +1,16 @@
 {% extends "layout.html" %}
 {% block body %}
-    <form action="{{ url_for('add') }}" method=post>
+    {% if number_of_donuts_remaining == 1 %}
+        There is <strong>1</strong> donut remaining!
+    {% else %}
         There are <strong>{{ number_of_donuts_remaining }}</strong> donuts remaining!
-        <br />
-        Name:
-        <input type=text name=name />
-        <input type=submit value="Take Donut" />
-    </form>
+    {% endif %}
+    {% if number_of_donuts_remaining %}
+        <form action="{{ url_for('take_donut') }}" method=post>
+            <br />
+            Name:
+            <input type=text name=name />
+            <input type=submit value="Take Donut" />
+        </form>
+    {% endif %}
 {% endblock %}
