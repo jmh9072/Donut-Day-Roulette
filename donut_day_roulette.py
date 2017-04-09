@@ -58,7 +58,11 @@ def take_donut():
                 participants[today] = todays_participants
         return redirect(url_for('view_entries'))
     elif request.method == 'GET':
-        return render_template_page('take_donut.html', number_of_donuts_remaining=TOTAL_NUMBER_OF_DONUTS-len(todays_participants))
+        number_of_donuts_remaining = 0
+        countdown_end_datetime = datetime.datetime(today.year, today.month, today.day, 17, 00, 00)
+        if datetime.datetime.now() <= countdown_end_datetime:
+            number_of_donuts_remaining = TOTAL_NUMBER_OF_DONUTS-len(todays_participants)
+        return render_template_page('take_donut.html', number_of_donuts_remaining=number_of_donuts_remaining)
 
 @app.route('/donut_cam')
 def donut_cam():
