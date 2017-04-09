@@ -38,8 +38,8 @@ def view_entries():
     if len(todays_participants):
         todays_participant_list = todays_participants + (TOTAL_NUMBER_OF_DONUTS-len(todays_participants))*['']
     today = datetime.date.today()
-    countdown_end_datetime = datetime.datetime(today.year, today.month, today.day, 17, 0, 0)
-    if not countdown_end_datetime in losing_participant and datetime.datetime.now() > countdown_end_datetime:
+    countdown_end_datetime = datetime.datetime(today.year, today.month, today.day, 17, 00, 00)
+    if not today in losing_participant and datetime.datetime.now() > countdown_end_datetime:
         losing_participant[today] = random.choice(participants.get(today, ['Nobody']))
     return render_template_page('view_entries.html',
                                 participants=todays_participant_list,
