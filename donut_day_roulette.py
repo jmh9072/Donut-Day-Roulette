@@ -5,7 +5,7 @@ from flask import redirect, url_for, send_file
 import random
 import datetime
 from PIL import Image
-from io import StringIO
+from io import BytesIO
 
 MESSAGES_OF_THE_DAY = ['Free* donuts!',
                        'Eleven donuts are free. One costs eleven times too much.',
@@ -86,7 +86,7 @@ def donut_cam_image():
     donut_cam_image = donutcam.get_image()
     donut_cam_string = pygame.image.tostring(donut_cam_image, "RGBA", False)
     donut_cam_pil = Image.frombytes("RGBA", donut_cam_image.get_size(), donut_cam_string)
-    donut_cam_stringio = StringIO()
+    donut_cam_stringio = BytesIO()
     donut_cam_pil.save(donut_cam_stringio, 'PNG')
     donut_cam_stringio.seek(0)
     return send_file(donut_cam_stringio, mimetype='image/png')
