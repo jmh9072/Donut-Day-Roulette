@@ -1,4 +1,11 @@
 {% extends "layout.html" %}
 {% block body %}
-Coming soon!
+    <div style="text-align:center">
+        {% if number_of_donuts_remaining == 1 %}
+            There is <strong>1</strong> donut remaining!
+        {% else %}
+            There are <strong>{{ number_of_donuts_remaining }}</strong> donuts remaining!
+        {% endif %}
+        <img src="./donut_cam_image.png" />
+    </div>
 {% endblock %}

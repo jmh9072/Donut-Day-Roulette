@@ -1,9 +1,11 @@
 from flask import Flask
 from flask import render_template
 from flask import request
-from flask import redirect, url_for
+from flask import redirect, url_for, send_file
 import random
 import datetime
+from PIL import Image
+from io import StringIO
 
 MESSAGES_OF_THE_DAY = ['Free* donuts!',
                        'Eleven donuts are free. One costs eleven times too much.',
@@ -17,6 +19,11 @@ TOTAL_NUMBER_OF_DONUTS = 12
 participants = {}
 losing_participant = {}
 app = Flask(__name__)
+
+import pygame.camera, pygame.image
+pygame.camera.init()
+donutcam = pygame.camera.Camera(pygame.camera.list_cameras()[0])
+donutcam.start()
 
 def render_template_page(filename, **kwargs):
     return render_template(filename, message_of_the_day=random.choice(MESSAGES_OF_THE_DAY), **kwargs)
@@ -68,4 +75,18 @@ def take_donut():
 def donut_cam():
     today = datetime.date.today()
     todays_participants = participants.get(today, [])
-    return render_template_page('donut_cam.html', number_of_donuts_remaining=TOTAL_NUMBER_OF_DONUTS-len(todays_participants))
+    number_of_donuts_remaining = 0
+    countdown_end_datetime = datetime.datetime(today.year, today.month, today.day, 17, 00, 00)
+    if datetime.datetime.now() <= countdown_end_datetime:
+        number_of_donuts_remaining = TOTAL_NUMBER_OF_DONUTS - len(todays_participants)
+    return render_template_page('donut_cam.html', number_of_donuts_remaining=number_of_donuts_remaining)
+
+@app.route('/donut_cam_image.png')
+def donut_cam_image():
+    donut_cam_image = donutcam.get_image()
+    donut_cam_string = pygame.image.tostring(donut_cam_image, "RGBA", False)
+    donut_cam_pil = Image.frombytes("RGBA", donut_cam_image.get_size(), donut_cam_string)
+    donut_cam_stringio = StringIO()
+    donut_cam_pil.save(donut_cam_stringio, 'PNG')
+    donut_cam_stringio.seek(0)
+    return send_file(donut_cam_stringio, mimetype='image/png')

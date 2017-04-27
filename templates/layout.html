@@ -2,6 +2,7 @@
 <title>Donut Day Roulette</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
+    <div style="text-align:center">
     <h1><a href="./">Donut Day Roulette</a></h1>
     {{ message_of_the_day }}
     <br /><br />
@@ -10,5 +11,6 @@
     <a href="./take_donut" class="button">Take Donut</a>
     <a href="./donut_cam" class="button">Donut Cam</a>
     <br /><br />
+    </div>
     {% block body %}{% endblock %}
 </div>
