@@ -6,6 +6,7 @@
         {% else %}
             There are <strong>{{ number_of_donuts_remaining }}</strong> donuts remaining!
         {% endif %}
-        <img src="./donut_cam_image.png" />
+        <br />
+        <img src="{{url_for('static', filename='donut_cam.jpg')}}" width=640 height=480 />
     </div>
 {% endblock %}

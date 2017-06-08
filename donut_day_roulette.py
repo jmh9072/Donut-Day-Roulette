@@ -2,10 +2,15 @@ from flask import Flask
 from flask import render_template
 from flask import request
 from flask import redirect, url_for, send_file
-import random
+from flask import abort
+from werkzeug.utils import secure_filename
+
+import os
 import datetime
 from PIL import Image
-from io import BytesIO
+import random
+
+API_KEY = '12345'
 
 MESSAGES_OF_THE_DAY = ['Free* donuts!',
                        'Eleven donuts are free. One costs eleven times too much.',
@@ -20,13 +25,12 @@ participants = {}
 losing_participant = {}
 app = Flask(__name__)
 
-import pygame.camera, pygame.image
-pygame.camera.init()
-donutcam = pygame.camera.Camera(pygame.camera.list_cameras()[0])
-donutcam.start()
-
 def render_template_page(filename, **kwargs):
     return render_template(filename, message_of_the_day=random.choice(MESSAGES_OF_THE_DAY), **kwargs)
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ['jpg']
 
 @app.route('/')
 def root():
@@ -81,12 +85,17 @@ def donut_cam():
         number_of_donuts_remaining = TOTAL_NUMBER_OF_DONUTS - len(todays_participants)
     return render_template_page('donut_cam.html', number_of_donuts_remaining=number_of_donuts_remaining)
 
-@app.route('/donut_cam_image.png')
-def donut_cam_image():
-    donut_cam_image = donutcam.get_image()
-    donut_cam_string = pygame.image.tostring(donut_cam_image, "RGBA", False)
-    donut_cam_pil = Image.frombytes("RGBA", donut_cam_image.get_size(), donut_cam_string)
-    donut_cam_stringio = BytesIO()
-    donut_cam_pil.save(donut_cam_stringio, 'PNG')
-    donut_cam_stringio.seek(0)
-    return send_file(donut_cam_stringio, mimetype='image/png')
+@app.route('/upload_donut_cam_image', methods=['POST'])
+def upload_file():
+    # authentication check
+    if not 'api-key' in request.form:
+        abort(401)
+    if request.form['api-key'] != API_KEY:
+        abort(401)
+    if not 'file' in request.files:
+        abort(400)
+    file = request.files['file']
+    if file and allowed_file(file.filename):
+        filename = 'donut_cam.jpg'
+        file.save(os.path.join(os.getcwd(), 'static', filename))
+        return 'Upload complete!'
