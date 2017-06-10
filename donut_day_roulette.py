@@ -3,11 +3,10 @@ from flask import render_template
 from flask import request
 from flask import redirect, url_for, send_file
 from flask import abort
-from werkzeug.utils import secure_filename
+from database import db_session
 
 import os
 import datetime
-from PIL import Image
 import random
 
 API_KEY = '12345'
@@ -26,7 +25,7 @@ losing_participant = {}
 app = Flask(__name__)
 
 def render_template_page(filename, **kwargs):
-    return render_template(filename, message_of_the_day=random.choice(MESSAGES_OF_THE_DAY), **kwargs)
+    return render_template(filename, message_of_the_day=random.choice(MESSAGES_OF_THE_DAY), logged_in=False, **kwargs)
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -99,3 +98,19 @@ def upload_file():
         filename = 'donut_cam.jpg'
         file.save(os.path.join(os.getcwd(), 'static', filename))
         return 'Upload complete!'
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    pass
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    pass
+
+@app.route('/logout')
+def logout():
+    pass
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.remove()

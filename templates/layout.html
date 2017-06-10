@@ -7,9 +7,14 @@
     {{ message_of_the_day }}
     <br /><br />
     <a href="./how_it_works" class="button">How It Works</a>
+    {% if logged_in %}
     <a href="./view_entries" class="button">View Entries</a>
     <a href="./take_donut" class="button">Take Donut</a>
     <a href="./donut_cam" class="button">Donut Cam</a>
+    {% else %}
+    <a href="./register" class="button">Register</a>
+    <a href="./login" class="button">Login</a>
+    {% endif %}
     <br /><br />
     </div>
     {% block body %}{% endblock %}
