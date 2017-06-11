@@ -1,9 +1,11 @@
 from flask import Flask
 from flask import render_template
 from flask import request
+from flask import session
 from flask import redirect, url_for, send_file
 from flask import abort
 from database import db_session
+from models import User
 
 import os
 import datetime
@@ -23,9 +25,10 @@ TOTAL_NUMBER_OF_DONUTS = 12
 participants = {}
 losing_participant = {}
 app = Flask(__name__)
+app.secret_key = b'\xdeo\xd3\xe9\xf8\x03\xc33-\xde\xb7\xc4D=py\xe5V\x9f\xe8t\xb0\x90q'
 
 def render_template_page(filename, **kwargs):
-    return render_template(filename, message_of_the_day=random.choice(MESSAGES_OF_THE_DAY), logged_in=False, **kwargs)
+    return render_template(filename, message_of_the_day=random.choice(MESSAGES_OF_THE_DAY), logged_in='username' in session, **kwargs)
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -99,17 +102,54 @@ def upload_file():
         file.save(os.path.join(os.getcwd(), 'static', filename))
         return 'Upload complete!'
 
+def username_exists(username):
+    query = db_session.query(User).filter(User.username==username)
+    if query.count():
+        return True
+    return False
+
+def authenticate_user(username, password):
+    query = db_session.query(User).filter(User.username==username)
+    if query.count() == 1:
+        user = query.first()
+        return user.check_password(password)
+    return False
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    pass
+    if request.method == 'POST':
+        username = request.form['username']
+        if username_exists(username):
+            return render_template_page('register.html', message='Error: Username already exists!')
+        password = request.form['password']
+        new_user = User(username=username, password=password)
+        db_session.add(new_user)
+        db_session.commit()
+        session['username'] = username
+        return redirect('/')
+    else:
+        return render_template_page('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    pass
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if authenticate_user(username, password):
+            session['username'] = username
+            return redirect('/')
+        return render_template_page('/login.html', message='Error: Username/password combination doesn\'t exist!')
+    else:
+        return render_template_page('login.html')
 
 @app.route('/logout')
 def logout():
-    pass
+    del session['username']
+    return redirect('/')
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    return render_template_page('settings.html')
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):

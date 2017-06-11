@@ -10,7 +10,7 @@ class User(Base):
 
     def __init__(self, username=None, password=None):
         self.username = username
-        self.password = password
+        self.set_password(password)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)

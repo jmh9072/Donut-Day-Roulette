@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block body %}
+    {% if groups %}
+    Member of groups:
+    <ol>
+        {% for group in groups %}
+        <li>{{ group }}</li>
+        {% endfor %}
+    </ol>
+    {% else %}
+        You haven't joined any groups yet!
+    {% endif %}
+    <br />
+    <a href="create_new_group">Create new group</a>
+    <br />
+    <a href="join_group">Join group</a>
+{% endblock %}
