@@ -5,7 +5,7 @@ from flask import session
 from flask import redirect, url_for, send_file
 from flask import abort
 from database import db_session
-from models import User
+from models import User, User_Group, Group, Contest
 
 import os
 import datetime
@@ -112,8 +112,9 @@ def authenticate_user(username, password):
     query = db_session.query(User).filter(User.username==username)
     if query.count() == 1:
         user = query.first()
-        return user.check_password(password)
-    return False
+        if user.check_password(password):
+            return user.id
+    return 0
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -125,6 +126,7 @@ def register():
         new_user = User(username=username, password=password)
         db_session.add(new_user)
         db_session.commit()
+        session['userid'] = new_user.id
         session['username'] = username
         return redirect('/')
     else:
@@ -135,7 +137,9 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if authenticate_user(username, password):
+        user_id = authenticate_user(username, password)
+        if user_id:
+            session['userid'] = user_id
             session['username'] = username
             return redirect('/')
         return render_template_page('/login.html', message='Error: Username/password combination doesn\'t exist!')
@@ -149,7 +153,22 @@ def logout():
 
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
+    groups = []
+    if 'userid' in session:
+        user_group_query = db_session.query(User_Group).filter(User_Group.user==session['userid'])
+        if user_group_query.count():
+            group_ids = [user_group.group for user_group in user_group_query.all()]
+            group_query = db_session.query(Group).filter(Group.id.in_(group_ids))
+            if group_query.count():
+                return render_template_page('settings.html', groups=group_query.all())
     return render_template_page('settings.html')
+
+@app.route('/join_group')
+def join_group():
+    if 'group_id' in request.args:
+        return redirect(url_for('/settings'))
+    else:
+        return 'No group ID selected'
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):

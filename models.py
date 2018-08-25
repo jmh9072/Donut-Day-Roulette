@@ -23,8 +23,7 @@ class Group(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(256), unique=True)
     access_password = Column(String(512))
-    start_date = Column(String(64))
-    end_date = Column(String(64))
+    current_donut_master = Column(Integer, ForeignKey('user.id'))
 
     def __init__(self, name=None, access_password=None, start_date=None, end_date=None):
         self.name = name
@@ -43,3 +42,17 @@ class User_Group(Base):
         self.user = user
         self.group = group
         self.is_admin = is_admin
+
+class Contest(Base):
+    __tablename__ = 'contest'
+    id = Column(Integer, primary_key=True)
+    group = Column(Integer, ForeignKey('group.id'))
+    donut_master = Column(Integer, ForeignKey('user.id'))
+    start_date = Column(String(64))
+    end_date = Column(String(64))
+
+    def __init__(self, group=None, donut_master=None, start_date='', end_date=''):
+        self.group = group
+        self.donut_master = donut_master
+        self.start_date = start_date
+        self.end_date = end_date

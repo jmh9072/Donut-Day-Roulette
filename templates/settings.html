@@ -4,14 +4,12 @@
     Member of groups:
     <ol>
         {% for group in groups %}
-        <li>{{ group }}</li>
+        <li><a href="view_entries?group_id={{ group.id }}">{{ group.name }}</a></li>
         {% endfor %}
     </ol>
     {% else %}
-        You haven't joined any groups yet!
+        You haven't joined any groups yet! Ask a group owner for a join link.
     {% endif %}
     <br />
     <a href="create_new_group">Create new group</a>
-    <br />
-    <a href="join_group">Join group</a>
 {% endblock %}
