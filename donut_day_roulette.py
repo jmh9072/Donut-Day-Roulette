@@ -5,7 +5,7 @@ from flask import redirect, url_for, send_file
 from flask import abort
 from werkzeug.utils import secure_filename
 
-import os
+import os, os.path
 import datetime
 from PIL import Image
 import random
@@ -24,6 +24,12 @@ TOTAL_NUMBER_OF_DONUTS = 12
 participants = {}
 losing_participant = {}
 app = Flask(__name__)
+
+@app.after_request
+def add_header(response):
+    response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
+    response.headers['Cache-Control'] = 'public, max-age=0'
+    return response
 
 def render_template_page(filename, **kwargs):
     return render_template(filename, message_of_the_day=random.choice(MESSAGES_OF_THE_DAY), **kwargs)
@@ -97,5 +103,5 @@ def upload_file():
     file = request.files['file']
     if file and allowed_file(file.filename):
         filename = 'donut_cam.jpg'
-        file.save(os.path.join(os.getcwd(), 'static', filename))
+        file.save(os.path.join(os.path.dirname(__file__), 'static', filename))
         return 'Upload complete!'
